@@ -1,0 +1,33 @@
+name: Build and Deploy
+
+on:
+  push:
+    - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@main
+
+      - name: Engine
+        uses: actions/checkout@main
+        with:
+          repository: cmtv/test-engine
+          path: 'engine'
+
+      - uses: actions/setup-node@main
+
+      - name: Install and Build 🔧
+        run: |
+          cd engine
+          npm ci
+          npm run build
+          npx ts-node main ..
+      
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@4.1.7
+        with:
+          branch: gh-pages
+          folder: engine/dist
